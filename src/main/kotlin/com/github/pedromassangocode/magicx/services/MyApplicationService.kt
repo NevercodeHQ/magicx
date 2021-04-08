@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.pedromassangocode.magicx.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.pedromassangocode.magicx.MyBundle
 
 class MyApplicationService {
 
