@@ -1,1 +1,1 @@
-rootProject.name = "magicx"
+rootProject.name = "triagemagic"

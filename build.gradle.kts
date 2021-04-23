@@ -43,6 +43,8 @@ intellij {
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
+    setPlugins("Dart:202.8443")
+    setPlugins("io.flutter:55.1.2")
 }
 
 // Configure gradle-changelog-plugin plugin.

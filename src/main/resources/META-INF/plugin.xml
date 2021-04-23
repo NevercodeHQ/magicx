@@ -1,19 +1,23 @@
 <idea-plugin>
-    <id>com.github.pedromassangocode.magicx</id>
-    <name>magicx</name>
-    <vendor>pedromassangocode</vendor>
+    <id>com.nevercode.triagemagic</id>
+    <name>Triagemagic</name>
+    <vendor>Nevercode</vendor>
+
+    <category>Custom Languages</category>
+    <version>SNAPSHOT</version>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>Dart</depends>
+    <depends>io.flutter</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.pedromassangocode.magicx.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.pedromassangocode.magicx.services.MyProjectService"/>
-    </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.pedromassangocode.magicx.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+       <toolWindow id="Triagemagic" anchor="right"
+                    factoryClass="com.nevercode.triagemagic.view.TriagemagicViewFactory" />
+        <projectService serviceImplementation="com.nevercode.triagemagic.view.TriagemagicView"
+                        overrides="false"/>
+    </extensions>
 </idea-plugin>
