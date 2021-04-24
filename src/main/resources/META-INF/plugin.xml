@@ -10,7 +10,6 @@
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends>Dart</depends>
     <depends>io.flutter</depends>
 
     <extensions defaultExtensionNs="com.intellij">
