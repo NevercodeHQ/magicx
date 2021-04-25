@@ -4,7 +4,7 @@
     <vendor>Nevercode</vendor>
 
     <category>Custom Languages</category>
-    <version>SNAPSHOT</version>
+    <version>1.0</version>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
