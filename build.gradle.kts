@@ -38,13 +38,9 @@ intellij {
     pluginName = properties("pluginName")
     version = properties("platformVersion")
     type = properties("platformType")
-    downloadSources = false
-    updateSinceUntilBuild = false
-    sandboxDirectory = "sandbox"
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    //setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
-    setPlugins("io.flutter:55.1.2")
+    setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
 }
 
 // Configure gradle-changelog-plugin plugin.
