@@ -220,7 +220,7 @@ class TriageTabContent(
         sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
             // This is not getting called first actually.
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "running flutter doctor -v on ${getSdkName(currentChannelPath)}..."
+                cmdInfoOutput = "running flutter doctor -v on ${getSdkName(null, sdk = sdk)}..."
                 onRefresh(true)
             }
 
@@ -255,14 +255,16 @@ class TriageTabContent(
     }
 
     /// Return either the channel name or the last segment of the path.
-    private fun getSdkName(sdkPath: String): String {
-        val channelName = getFlutterSdk(sdkPath)?.queryFlutterChannel(true)?.id?.name
+    private fun getSdkName(sdkPath: String? = null, sdk: FlutterSdk? = null): String {
+        assert(sdkPath == null || sdk == null)
+        val channelName = (sdk ?: getFlutterSdk(sdkPath!!))?.queryFlutterChannel(true)?.id?.name
         if (channelName != null) return channelName.toLowerCase()
 
+        assert(sdkPath != null)
         return try {
-            sdkPath.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
+            sdkPath!!.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
         } catch (e: Exception) {
-            sdkPath.substring(sdkPath.lastIndexOf('/')).toLowerCase()
+            sdkPath!!.substring(sdkPath.lastIndexOf('/')).toLowerCase()
         }
     }
 
@@ -291,7 +293,7 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "Running flutter run on ${getSdkName(flutterChannelHomePath)}..."
+                cmdInfoOutput = "Running flutter run on ${getSdkName(sdk = sdk)}..."
                 onRefresh(true)
             }
 
