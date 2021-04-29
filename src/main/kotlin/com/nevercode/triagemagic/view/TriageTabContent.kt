@@ -30,7 +30,7 @@ class TriageTabContent(
     private var availableDevices = mutableListOf<FlutterDevice>()
     private var knownFlutterSdkPaths = arrayListOf<String>()
     private var selectedDevice: FlutterDevice? = null
-    private var cmdInfoOutput: StringBuilder = StringBuilder()
+    private var cmdInfoOutput: String = ""
 
     init {
         // Listen to available devices changes
@@ -135,9 +135,14 @@ class TriageTabContent(
 
         if (knownFlutterSdkPaths.isNotEmpty()) {
             val getOnSelectedChannelBtn = Button("For selected channels")
-            getOnSelectedChannelBtn.addActionListener { onGenerateFlutterDoctors(selectedChannels.toArrayList()) }
+            getOnSelectedChannelBtn.addActionListener {
+                if (selectedChannels.isNotEmpty())
+                    onGenerateFlutterDoctors(selectedChannels.toArrayList())
+            }
+
             val runAllButton = Button("For all channels")
             runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+
             panel.add(getOnSelectedChannelBtn)
             panel.add(runAllButton)
             panel.add(gapComponent())
@@ -155,9 +160,14 @@ class TriageTabContent(
 
         if (knownFlutterSdkPaths.isNotEmpty() && selectedDevice != null) {
             val runDebugBtn = Button("Run on selected channels")
-            runDebugBtn.addActionListener { runProject(selectedChannels, selectedDevice!!) }
+            runDebugBtn.addActionListener {
+                if (selectedChannels.isNotEmpty())
+                    runProject(selectedChannels, selectedDevice!!)
+            }
+
             val runAllButton = Button("Run all channels on ${selectedDevice?.deviceName() ?: "<select-device>" }")
             runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+
             panel.add(runDebugBtn)
             panel.add(runAllButton)
             panel.add(gapComponent())
@@ -213,14 +223,12 @@ class TriageTabContent(
         sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
             // This is not getting called first actually.
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput.clear()
-                cmdInfoOutput.append("running ${getSdkName(currentChannelPath)} doctor -v...")
+                cmdInfoOutput = "running ${getSdkName(currentChannelPath)} doctor -v..."
                 onRefresh(true)
             }
 
             override fun processTerminated(event: ProcessEvent) {
-                cmdInfoOutput.clear()
-                cmdInfoOutput.append("Logs copied on Clipboard!")
+                cmdInfoOutput = "Logs copied on Clipboard!"
                 onRefresh(true)
 
                 doctorContent.append("\n```\n")
@@ -282,14 +290,12 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput.clear()
-                cmdInfoOutput.append("Running flutter run on ${sdk.version.versionText}...")
+                cmdInfoOutput = "Running flutter run on ${sdk.version.versionText}..."
                 onRefresh(true)
             }
 
             override fun processTerminated(event: ProcessEvent) {
-                cmdInfoOutput.clear()
-                cmdInfoOutput.append("Logs copied to clipboard!")
+                cmdInfoOutput = "Logs copied to clipboard!"
                 onRefresh(true)
 
                 runContent.append("\n```\n")
