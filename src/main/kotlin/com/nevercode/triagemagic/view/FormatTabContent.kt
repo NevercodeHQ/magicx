@@ -23,9 +23,9 @@ class FormatTabContent : JPanel(VerticalLayout()) {
 
         val infoPanel = JPanel(VerticalLayout())
         infoPanel.border = BorderFactory.createEmptyBorder(16, 24, 16, 24)
-        infoPanel.add(Label("1. Copy the content;"))
-        infoPanel.add(Label("2. Click a button bellow;"))
-        infoPanel.add(Label("2. Formatted data will be in your clipboard."))
+        infoPanel.add(Label("1. Copy the content"))
+        infoPanel.add(Label("2. Click a button bellow"))
+        infoPanel.add(Label("3. Formatted data will be in your clipboard."))
         add(infoPanel)
 
         FormatKind.values().forEach { formatKind ->
