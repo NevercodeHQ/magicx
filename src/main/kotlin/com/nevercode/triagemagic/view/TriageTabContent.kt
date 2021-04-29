@@ -187,10 +187,7 @@ class TriageTabContent(
         return header
     }
 
-    private fun gapComponent(): Component {
-        val gap = Label("")
-        return gap
-    }
+    private fun gapComponent() = Label()
 
     private fun onRefresh(uiOnly: Boolean = false) {
         if (!uiOnly) {

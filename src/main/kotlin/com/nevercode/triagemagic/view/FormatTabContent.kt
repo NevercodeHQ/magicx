@@ -15,7 +15,7 @@ class FormatTabContent : JPanel(VerticalLayout()) {
     init { buildUI() }
 
     private fun buildUI() {
-        border = BorderFactory.createEmptyBorder(32, 24, 0, 24)
+        border = BorderFactory.createEmptyBorder(64, 24, 0, 24)
 
         val header = Label("Format content")
         header.font = Font("", 70, 16)
