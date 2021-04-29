@@ -112,8 +112,8 @@ class TriageTabContent(
             group.add(Label("No Channel!"))
         } else {
             knownFlutterSdkPaths.forEach { channelPath ->
-                val name = channelPath.substring(channelPath.lastIndexOf('_') + 1)
-                val btn = JRadioButton(name.capitalize())
+                val name = getSdkName(channelPath)
+                val btn = JRadioButton(name)
                 btn.isSelected = selectedChannels.contains(channelPath)
                 btn.addChangeListener {
                     when (btn.isSelected) {
@@ -220,7 +220,7 @@ class TriageTabContent(
         sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
             // This is not getting called first actually.
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "running ${getSdkName(currentChannelPath)} doctor -v..."
+                cmdInfoOutput = "running flutter doctor -v on ${getSdkName(currentChannelPath)}..."
                 onRefresh(true)
             }
 
@@ -254,11 +254,15 @@ class TriageTabContent(
         })
     }
 
+    /// Return either the channel name or the last segment of the path.
     private fun getSdkName(sdkPath: String): String {
+        val channelName = getFlutterSdk(sdkPath)?.queryFlutterChannel(true)?.id?.name
+        if (channelName != null) return channelName.toLowerCase()
+
         return try {
-            sdkPath.substring(sdkPath.lastIndexOf('_') + 1).capitalize()
+            sdkPath.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
         } catch (e: Exception) {
-            sdkPath.substring(sdkPath.lastIndexOf('/'))
+            sdkPath.substring(sdkPath.lastIndexOf('/')).toLowerCase()
         }
     }
 
@@ -287,7 +291,7 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "Running flutter run on ${sdk.version.versionText}..."
+                cmdInfoOutput = "Running flutter run on ${getSdkName(flutterChannelHomePath)}..."
                 onRefresh(true)
             }
 
