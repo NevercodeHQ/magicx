@@ -6,7 +6,6 @@
 
 package com.nevercode.triagemagic.view
 
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Storage
@@ -19,9 +18,8 @@ import com.intellij.util.EventDispatcher
 import com.intellij.util.xmlb.annotations.Attribute
 import io.flutter.pub.PubRoots
 import io.flutter.run.daemon.DeviceService
-import java.awt.BorderLayout
+import org.jdesktop.swingx.VerticalLayout
 import java.awt.Component
-import java.awt.Label
 import javax.swing.JPanel
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
@@ -52,36 +50,17 @@ class TriagemagicView : PersistentStateComponent<TriagemagicViewState>, Disposab
 
         val contentManager = toolWindow.contentManager
 
-        val triageTabContent = TriageTabContent(
-            project,
-            deviceService,
-            pubProjectRoot
-        )
+        val triageTabContent = TriageTabContent(project, deviceService, pubProjectRoot)
 
-        contentManager.addContent(createTriageTab(contentManager, triageTabContent))
-        contentManager.addContent(createTemplateTab(contentManager))
+        contentManager.addContent(createTab("Triage", contentManager, triageTabContent))
+        contentManager.addContent(createTab("Format", contentManager, FormatTabContent()))
+        contentManager.addContent(createTab("Template", contentManager, JPanel(VerticalLayout())))
     }
 
-    private fun createTriageTab(contentManager: ContentManager, tabContent: Component): Content {
-        val tab = JPanel(BorderLayout())
-        tab.add(tabContent)
-
-        val content = contentManager.factory.createContent(null, "Triage", false)
-        content.component = tab
-        content.putUserData(ToolWindow.SHOW_CONTENT_ICON, java.lang.Boolean.TRUE)
-        content.icon = AllIcons.General.AddJdk
-        return content
-    }
-
-    private fun createTemplateTab(contentManager: ContentManager): Content {
-        val tabContainer = JPanel(BorderLayout())
-        tabContainer.add(Label("Add triage templates."), BorderLayout.CENTER)
-
-        val content: Content = contentManager.factory.createContent(null, "Template", false)
-        content.component = tabContainer
-        content.putUserData(ToolWindow.SHOW_CONTENT_ICON, java.lang.Boolean.TRUE)
-        content.icon = AllIcons.Actions.ListFiles
-        return content
+    private fun createTab(name: String, contentManager: ContentManager, tabContent: Component): Content {
+        val tabContainer = JPanel(VerticalLayout())
+        tabContainer.add(tabContent)
+        return contentManager.factory.createContent(tabContainer, name, false)
     }
 }
 
