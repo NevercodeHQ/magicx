@@ -10,11 +10,13 @@ import io.flutter.run.FlutterLaunchMode
 import io.flutter.run.common.RunMode
 import io.flutter.run.daemon.DeviceService
 import io.flutter.sdk.FlutterSdk
+import io.flutter.sdk.FlutterSdkChannel
 import io.flutter.sdk.FlutterSdkUtil
 import org.jdesktop.swingx.HorizontalLayout
 import org.jdesktop.swingx.VerticalLayout
 import java.awt.*
 import java.awt.datatransfer.StringSelection
+import java.awt.event.ItemEvent
 import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
 import javax.swing.JPanel
@@ -26,11 +28,20 @@ class TriageTabContent(
     private val pubProjectRoot: PubRoot,
 ) : JPanel(BorderLayout()) {
 
-    private var selectedChannels = mutableSetOf<String>()
     private var availableDevices = mutableListOf<FlutterDevice>()
     private var knownFlutterSdkPaths = arrayListOf<String>()
+
+    // Run on Multiple Channels
+    private var selectedChannels = mutableSetOf<String>()
     private var selectedDevice: FlutterDevice? = null
-    private var cmdInfoOutput: String = ""
+    private var multipleChannelsOutput: String = ""
+
+    // Run on Multiple Channels
+    private var selectedChannel = ""
+    private var selectedDevices = mutableSetOf<FlutterDevice>()
+    private var multipleDevicesOutput: String = ""
+
+    private var doctorVOutput: String = ""
 
     init {
         // Listen to available devices changes
@@ -43,13 +54,11 @@ class TriageTabContent(
             }
             onRefresh()
         }
-
         add(buildContent())
     }
 
     private fun buildContent(): Component {
         val group = JPanel(VerticalLayout())
-        group.maximumSize = Dimension(180, 2400)
 
         group.border = BorderFactory.createEmptyBorder(8, 32, 0, 32)
 
@@ -60,68 +69,117 @@ class TriageTabContent(
         group.add(gapComponent())
         group.add(gapComponent())
         group.add(gapComponent())
-        group.add(createHeader("Select Channel(s) and one device"))
+
+        if (knownFlutterSdkPaths.isEmpty()) {
+            group.add(Label("No Flutter SDK available!"))
+            return  group
+        }
+
+        group.add(createHeader("Run on Multiple Channels"))
         group.add(gapComponent())
 
         val horizontalLayout = JPanel(HorizontalLayout())
+        horizontalLayout.border = BorderFactory.createEmptyBorder(4, 0,8,0)
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(gapComponent())
+        horizontalLayout.add(buildChannelsGroup(false))
         horizontalLayout.add(gapComponent())
-        horizontalLayout.add(buildChannelsGroup())
         horizontalLayout.add(gapComponent())
-        horizontalLayout.add(gapComponent())
-        horizontalLayout.add(buildDevicesGroup())
+        horizontalLayout.add(buildDevicesGroup( false))
         group.add(horizontalLayout)
+
+        val runDebugBtn = Button("Run")
+        runDebugBtn.isEnabled = selectedDevice != null && selectedChannels.isNotEmpty()
+        runDebugBtn.addActionListener { runMultipleChannels(selectedChannels, selectedDevice!!) }
+
+        group.add(runDebugBtn)
         group.add(gapComponent())
+        if (multipleChannelsOutput.isNotEmpty()) {
+            group.add(Label(multipleChannelsOutput))
+            group.add(gapComponent())
+        }
+
+        group.add(buildFlutterRunOnMultipleDevicesContent())
         group.add(buildFlutterDoctorsContent())
-        group.add(buildFlutterRunContent())
         return group
     }
 
-    private fun buildDevicesGroup(): Component {
+    private fun buildDevicesGroup(forMultipleDevices: Boolean): Component {
         val group = JPanel(VerticalLayout())
         group.add(Label("Devices"))
         group.add(gapComponent())
-        val g = ButtonGroup()
+        val g1 = ButtonGroup()
 
         if (availableDevices.isEmpty()) {
             group.add(Label("No Device!"))
         } else {
-            availableDevices.forEach { device ->
-                val radio = JRadioButton(device.deviceName())
-                radio.isSelected = selectedDevice?.deviceId() == device.deviceId()
-                radio.addActionListener {
-                    selectedDevice = device
-                    g.setSelected(radio.model, true)
-                    onRefresh(true)
+            if (forMultipleDevices) {
+                availableDevices.forEach { device ->
+                    val radio = JRadioButton(device.deviceName())
+                    radio.isSelected = selectedDevices.contains(device)
+                    radio.addActionListener {
+                        when (radio.isSelected) {
+                            true -> selectedDevices.add(device)
+                            false -> selectedDevices.remove(device)
+                        }
+                        onRefresh(true)
+                    }
+                    group.add(radio)
                 }
-                group.add(radio)
-                g.add(radio)
+            } else {
+                availableDevices.forEach { device ->
+                    val radio = JRadioButton(device.deviceName())
+                    radio.isSelected = selectedDevice?.deviceId() == device.deviceId()
+                    radio.addItemListener {
+                        selectedDevice = device
+                        g1.setSelected(radio.model, it.stateChange == ItemEvent.SELECTED)
+                        onRefresh(true)
+                    }
+                    group.add(radio)
+                    g1.add(radio)
+                }
             }
         }
         return group
     }
 
-    private fun buildChannelsGroup(): Component {
+    private fun buildChannelsGroup(forMultipleDevices: Boolean): Component {
         val group = JPanel(VerticalLayout())
         group.add(Label("Channels"))
         group.add(gapComponent())
+        val g = ButtonGroup()
 
-        if (knownFlutterSdkPaths.isEmpty()) {
-            group.add(Label("No Channel!"))
+        if (knownFlutterSdkPaths.isEmpty())  {
+                group.add(Label("No Channel!"))
         } else {
-            knownFlutterSdkPaths.forEach { channelPath ->
-                val name = getSdkName(channelPath)
-                val btn = JRadioButton(name)
-                btn.isSelected = selectedChannels.contains(channelPath)
-                btn.addChangeListener {
-                    when (btn.isSelected) {
-                        true -> selectedChannels.add(channelPath)
-                        false -> selectedChannels.remove(channelPath)
+            if (forMultipleDevices) {
+                knownFlutterSdkPaths.forEach { channelPath ->
+                    val name = getSdkName(channelPath)
+                    val btn = JRadioButton(name)
+                    btn.isSelected = selectedChannel == channelPath
+                    btn.addItemListener {
+                        selectedChannel = channelPath
+                        g.setSelected(btn.model, it.stateChange == ItemEvent.SELECTED)
+                        onRefresh( true)
                     }
+                    group.add(btn)
+                    g.add(btn)
                 }
-                group.add(btn)
+            } else {
+                knownFlutterSdkPaths.forEach { channelPath ->
+                    val name = getSdkName(channelPath)
+                    val btn = JRadioButton(name)
+                    btn.isSelected = selectedChannels.contains(channelPath)
+                    btn.addItemListener {
+                        when (it.stateChange == ItemEvent.SELECTED) {
+                            true -> selectedChannels.add(channelPath)
+                            false -> selectedChannels.remove(channelPath)
+                        }
+                        onRefresh(true)
+                    }
+                    group.add(btn)
+                }
             }
         }
         return group
@@ -129,54 +187,55 @@ class TriageTabContent(
 
     private fun buildFlutterDoctorsContent(): Component {
         val panel = JPanel(VerticalLayout())
-        panel.border = BorderFactory.createEmptyBorder(16,0, 0, 0)
+        panel.border = BorderFactory.createEmptyBorder(8,0, 0, 0)
         panel.add(createHeader("Generate Flutter Doctor"))
-        panel.add(gapComponent())
 
-        if (knownFlutterSdkPaths.isNotEmpty()) {
-            val getOnSelectedChannelBtn = Button("For selected channels")
-            getOnSelectedChannelBtn.addActionListener {
-                if (selectedChannels.isNotEmpty())
-                    onGenerateFlutterDoctors(selectedChannels.toArrayList())
-            }
+        val horizontalLayout = JPanel(GridLayout(0, 2))
+        horizontalLayout.border = BorderFactory.createEmptyBorder(8, 0,0,0)
+        knownFlutterSdkPaths.forEach {
+            val btn = Button("${getSdkName(it)} doctor -v")
+            btn.addActionListener { _ -> onGenerateFlutterDoctors(arrayListOf(it)) }
+            horizontalLayout.add(btn)
+        }
+        panel.add(horizontalLayout)
 
-            val runAllButton = Button("For all channels")
-            runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+        val runAllButton = Button("For all channels")
+        runAllButton.isEnabled = knownFlutterSdkPaths.isNotEmpty()
+        runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+        panel.add(runAllButton)
 
-            panel.add(getOnSelectedChannelBtn)
-            panel.add(runAllButton)
-            panel.add(gapComponent())
-        } else {
-            panel.add(Label("Flutter SDK not available"))
+        if (doctorVOutput.isNotEmpty()) {
+            panel.add(Label(doctorVOutput))
         }
         return panel
     }
 
-    private fun buildFlutterRunContent(): Component {
+    private fun buildFlutterRunOnMultipleDevicesContent(): Component {
         val panel = JPanel(VerticalLayout())
-        panel.border = BorderFactory.createEmptyBorder(12,0, 0, 0)
-        panel.add(createHeader("Flutter Run"))
+        panel.border = BorderFactory.createEmptyBorder(8,0, 0, 0)
+        panel.add(createHeader("Run on Multiple Devices"))
         panel.add(gapComponent())
 
-        if (knownFlutterSdkPaths.isNotEmpty() && selectedDevice != null) {
-            val runDebugBtn = Button("Run on selected channels")
-            runDebugBtn.addActionListener {
-                if (selectedChannels.isNotEmpty())
-                    runProject(selectedChannels, selectedDevice!!)
-            }
+        val horizontalLayout = JPanel(HorizontalLayout())
+        horizontalLayout.border = BorderFactory.createEmptyBorder(4, 0,8,0)
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(buildChannelsGroup(true))
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(buildDevicesGroup(true))
+        panel.add(horizontalLayout)
 
-            val runAllButton = Button("Run all channels on ${selectedDevice?.deviceName() ?: "<select-device>" }")
-            runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+        val runDebugBtn = Button("Run")
+        runDebugBtn.isEnabled = selectedChannel.isNotEmpty() && selectedDevices.isNotEmpty()
+        runDebugBtn.addActionListener { runMultipleDevices(selectedChannel, selectedDevices) }
 
-            panel.add(runDebugBtn)
-            panel.add(runAllButton)
+        panel.add(runDebugBtn)
+        panel.add(gapComponent())
+        if (multipleDevicesOutput.isNotEmpty()) {
+            panel.add(Label(multipleDevicesOutput))
             panel.add(gapComponent())
-            panel.add(gapComponent())
-            if (cmdInfoOutput.isNotEmpty()) {
-                panel.add(Label("LOG: $cmdInfoOutput"))
-            }
-        } else {
-            panel.add(Label("Flutter SDK not available"))
         }
         return panel
     }
@@ -204,7 +263,6 @@ class TriageTabContent(
             removeAll()
             add(buildContent())
             revalidate()
-            repaint()
         }
     }
 
@@ -220,12 +278,12 @@ class TriageTabContent(
         sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
             // This is not getting called first actually.
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "running flutter doctor -v on ${getSdkName(null, sdk = sdk)}..."
+                doctorVOutput = "Running flutter doctor -v on ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
                 onRefresh(true)
             }
 
             override fun processTerminated(event: ProcessEvent) {
-                cmdInfoOutput = "Logs copied on Clipboard!"
+                doctorVOutput = "Logs copied on Clipboard!"
                 onRefresh(true)
 
                 doctorContent.append("\n```\n")
@@ -247,7 +305,7 @@ class TriageTabContent(
                     doctorContent.append("<details>\n")
                     doctorContent.append("<summary>flutter doctor -v</summary>\n")
                     doctorContent.append("\n")
-                    doctorContent.append("```bash\n")
+                    doctorContent.append("```console\n")
                 }
                 doctorContent.append(event.text)
             }
@@ -255,16 +313,17 @@ class TriageTabContent(
     }
 
     /// Return either the channel name or the last segment of the path.
-    private fun getSdkName(sdkPath: String? = null, sdk: FlutterSdk? = null): String {
-        assert(sdkPath == null || sdk == null)
-        val channelName = (sdk ?: getFlutterSdk(sdkPath!!))?.queryFlutterChannel(true)?.id?.name
+    private fun getSdkName(sdkPath: String? = null, sdkChannel: FlutterSdkChannel? = null): String {
+        assert(sdkPath == null || sdkChannel == null)
+        if (sdkChannel != null) return  sdkChannel.id.name.toLowerCase()
+
+        val channelName = getFlutterSdk(sdkPath!!)?.queryFlutterChannel(true)?.id?.name
         if (channelName != null) return channelName.toLowerCase()
 
-        assert(sdkPath != null)
         return try {
-            sdkPath!!.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
+            sdkPath.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
         } catch (e: Exception) {
-            sdkPath!!.substring(sdkPath.lastIndexOf('/')).toLowerCase()
+            sdkPath.substring(sdkPath.lastIndexOf('/')).toLowerCase()
         }
     }
 
@@ -274,8 +333,8 @@ class TriageTabContent(
         return null
     }
 
-    val runContent = StringBuilder()
-    private fun runProject(flutterChannelHomePaths: MutableSet<String>, device: FlutterDevice, index: Int = 0) {
+    val multipleChannelsRunContent = StringBuilder()
+    private fun runMultipleChannels(flutterChannelHomePaths: MutableSet<String>, device: FlutterDevice, index: Int = 0) {
         if (flutterChannelHomePaths.isEmpty()) return
         if (index > flutterChannelHomePaths.size - 1) return
 
@@ -293,35 +352,87 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                cmdInfoOutput = "Running flutter run on ${getSdkName(sdk = sdk)}..."
+                multipleChannelsOutput = "Running flutter run on ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
                 onRefresh(true)
             }
 
             override fun processTerminated(event: ProcessEvent) {
-                cmdInfoOutput = "Logs copied to clipboard!"
+                multipleChannelsOutput = "Logs copied to clipboard!"
                 onRefresh(true)
 
-                runContent.append("\n```\n")
-                runContent.append("</details>\n")
+                multipleChannelsRunContent.append("\n```\n")
+                multipleChannelsRunContent.append("</details>\n")
 
                 if (isLastExecution) {
-                    val s = StringSelection(runContent.toString())
+                    val s = StringSelection(multipleChannelsRunContent.toString())
                     Toolkit.getDefaultToolkit().systemClipboard
                         .setContents(s, s)
-                    runContent.clear()
+                    multipleChannelsRunContent.clear()
                 } else {
-                    runProject(flutterChannelHomePaths, device, index + 1)
+                    runMultipleChannels(flutterChannelHomePaths, device, index + 1)
                 }
             }
 
             override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-                if (runContent.isEmpty() || runContent.endsWith("</details>\n")) {
-                    runContent.append("<details>\n")
-                    runContent.append("<summary>flutter doctor -v</summary>\n")
-                    runContent.append("\n")
-                    runContent.append("```bash\n")
+                if (multipleChannelsRunContent.isEmpty() || multipleChannelsRunContent.endsWith("</details>\n")) {
+                    multipleChannelsRunContent.append("<details>\n")
+                    multipleChannelsRunContent.append("<summary>logs</summary>\n")
+                    multipleChannelsRunContent.append("\n")
+                    multipleChannelsRunContent.append("```console\n")
                 }
-                runContent.append(event.text)
+                multipleChannelsRunContent.append(event.text)
+            }
+        })
+    }
+
+    val multipleDevicesRunContent = StringBuilder()
+    private fun runMultipleDevices(channelPath: String, devices: MutableSet<FlutterDevice>, index: Int = 0) {
+        if (devices.isEmpty()) return
+        if (index > devices.size - 1) return
+
+        val isLastExecution = index == devices.size -1
+        val currentDevice = devices.elementAt(index)
+        val sdk = getFlutterSdk(channelPath)
+        sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
+        sdk?.flutterRun(
+            pubProjectRoot,
+            pubProjectRoot.libMain!!,
+            currentDevice,
+            RunMode.DEBUG,
+            FlutterLaunchMode.DEBUG,
+            project,
+            "--verbose"
+        )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
+            override fun startNotified(event: ProcessEvent) {
+                multipleDevicesOutput = "Running ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))} on ${currentDevice.deviceName()}..."
+                onRefresh(true)
+            }
+
+            override fun processTerminated(event: ProcessEvent) {
+                multipleDevicesOutput = "Logs copied to clipboard!"
+                onRefresh(true)
+
+                multipleDevicesRunContent.append("\n```\n")
+                multipleDevicesRunContent.append("</details>\n")
+
+                if (isLastExecution) {
+                    val s = StringSelection(multipleDevicesRunContent.toString())
+                    Toolkit.getDefaultToolkit().systemClipboard
+                        .setContents(s, s)
+                    multipleDevicesRunContent.clear()
+                } else {
+                    runMultipleDevices(channelPath, devices, index + 1)
+                }
+            }
+
+            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
+                if (multipleDevicesRunContent.isEmpty() || multipleDevicesRunContent.endsWith("</details>\n")) {
+                    multipleDevicesRunContent.append("<details>\n")
+                    multipleDevicesRunContent.append("<summary>logs</summary>\n")
+                    multipleDevicesRunContent.append("\n")
+                    multipleDevicesRunContent.append("```bash\n")
+                }
+                multipleDevicesRunContent.append(event.text)
             }
         })
     }
