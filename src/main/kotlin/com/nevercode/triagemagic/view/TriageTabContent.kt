@@ -94,12 +94,11 @@ class TriageTabContent(
         runDebugBtn.addActionListener { runMultipleChannels(selectedChannels, selectedDevice!!) }
 
         group.add(runDebugBtn)
-        group.add(gapComponent())
         if (multipleChannelsOutput.isNotEmpty()) {
             group.add(Label(multipleChannelsOutput))
-            group.add(gapComponent())
         }
 
+        group.add(gapComponent())
         group.add(buildFlutterRunOnMultipleDevicesContent())
         group.add(buildFlutterDoctorsContent())
         return group
@@ -232,11 +231,11 @@ class TriageTabContent(
         runDebugBtn.addActionListener { runMultipleDevices(selectedChannel, selectedDevices) }
 
         panel.add(runDebugBtn)
-        panel.add(gapComponent())
         if (multipleDevicesOutput.isNotEmpty()) {
             panel.add(Label(multipleDevicesOutput))
-            panel.add(gapComponent())
         }
+
+        panel.add(gapComponent())
         return panel
     }
 
