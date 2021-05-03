@@ -42,6 +42,7 @@ class TriageTabContent(
     private var multipleDevicesOutput: String = ""
 
     private var doctorVOutput: String = ""
+    private var upgradeChannelsLogs = ""
 
     init {
         add(buildContent())
@@ -102,6 +103,7 @@ class TriageTabContent(
         group.add(gapComponent())
         group.add(buildFlutterRunOnMultipleDevicesContent())
         group.add(buildFlutterDoctorsContent())
+        group.add(upgradeChannelsContent())
         return group
     }
 
@@ -206,6 +208,27 @@ class TriageTabContent(
 
         if (doctorVOutput.isNotEmpty()) {
             panel.add(Label(doctorVOutput))
+        }
+
+        panel.add(gapComponent())
+        return panel
+    }
+
+    private fun upgradeChannelsContent(): Component {
+        val panel = JPanel(VerticalLayout())
+        panel.border = BorderFactory.createEmptyBorder(8,0, 0, 0)
+        panel.add(createHeader("Upgrade Flutter"))
+
+        val horizontalLayout = JPanel(GridLayout())
+        horizontalLayout.border = BorderFactory.createEmptyBorder(8, 0,0,0)
+
+        val runAllButton = Button("Upgrade All")
+        runAllButton.isEnabled = knownFlutterSdkPaths.isNotEmpty()
+        runAllButton.addActionListener { upgradeChannels(knownFlutterSdkPaths.toMutableSet()) }
+        panel.add(runAllButton)
+
+        if (upgradeChannelsLogs.isNotEmpty()) {
+            panel.add(Label(upgradeChannelsLogs))
         }
         return panel
     }
@@ -444,6 +467,33 @@ class TriageTabContent(
                 }
                 multipleDevicesRunContent.append(event.text)
             }
+        })
+    }
+
+    private fun upgradeChannels(flutterChannelHomePaths: MutableSet<String>, index: Int = 0) {
+        if (flutterChannelHomePaths.isEmpty()) return
+        if (index > flutterChannelHomePaths.size - 1) return
+
+        val isLastExecution = index == flutterChannelHomePaths.size -1
+        val channelPath = flutterChannelHomePaths.elementAt(index)
+        val sdk = getFlutterSdk(channelPath)
+        sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
+        sdk?.flutterUpgrade()?.startInConsole(project)?.addProcessListener(object: ProcessListener {
+            override fun startNotified(event: ProcessEvent) {
+                multipleDevicesOutput = "Upgrading ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
+                onRefresh(true)
+            }
+
+            override fun processTerminated(event: ProcessEvent) {
+                if (isLastExecution) {
+                    upgradeChannelsLogs = "Upgrade completed!"
+                    onRefresh(true)
+                } else {
+                    upgradeChannels(flutterChannelHomePaths, index + 1)
+                }
+            }
+
+            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) { }
         })
     }
 
