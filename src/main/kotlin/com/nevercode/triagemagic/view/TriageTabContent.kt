@@ -44,6 +44,8 @@ class TriageTabContent(
     private var doctorVOutput: String = ""
 
     init {
+        add(buildContent())
+
         // Listen to available devices changes
         deviceService.addListener {
             availableDevices.clear()
@@ -54,7 +56,6 @@ class TriageTabContent(
             }
             onRefresh()
         }
-        add(buildContent())
     }
 
     private fun buildContent(): Component {
@@ -247,7 +248,12 @@ class TriageTabContent(
 
     private fun gapComponent() = Label()
 
+    private var isRefreshing = false
     private fun onRefresh(uiOnly: Boolean = false) {
+        if (isRefreshing) return
+
+        isRefreshing = true
+
         if (!uiOnly) {
             knownFlutterSdkPaths.clear()
             knownFlutterSdkPaths.addAll(FlutterSdkUtil.getKnownFlutterSdkPaths())
@@ -262,6 +268,7 @@ class TriageTabContent(
             removeAll()
             add(buildContent())
             revalidate()
+            isRefreshing = false
         }
     }
 
@@ -316,13 +323,17 @@ class TriageTabContent(
         assert(sdkPath == null || sdkChannel == null)
         if (sdkChannel != null) return  sdkChannel.id.name.toLowerCase()
 
-        val channelName = getFlutterSdk(sdkPath!!)?.queryFlutterChannel(true)?.id?.name
+        val channelName = try {
+            getFlutterSdk(sdkPath!!)?.queryFlutterChannel(true)?.id?.name
+        } catch (e: Exception) {
+            null
+        }
         if (channelName != null) return channelName.toLowerCase()
 
         return try {
-            sdkPath.substring(sdkPath.lastIndexOf('_') + 1).toLowerCase()
+            sdkPath!!.substring(sdkPath.lastIndexOf('/') + 1).toLowerCase()
         } catch (e: Exception) {
-            sdkPath.substring(sdkPath.lastIndexOf('/')).toLowerCase()
+            "unknown"
         }
     }
 
