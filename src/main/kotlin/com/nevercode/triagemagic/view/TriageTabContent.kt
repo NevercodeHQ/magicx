@@ -480,7 +480,7 @@ class TriageTabContent(
         sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
         sdk?.flutterUpgrade()?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                multipleDevicesOutput = "Upgrading ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
+                upgradeChannelsLogs = "Upgrading ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
                 onRefresh(true)
             }
 
