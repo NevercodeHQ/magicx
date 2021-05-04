@@ -374,7 +374,6 @@ class TriageTabContent(
         val isLastExecution = index == flutterChannelHomePaths.size -1
         val flutterChannelHomePath = flutterChannelHomePaths.elementAt(index)
         val sdk = getFlutterSdk(flutterChannelHomePath)
-        sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
         sdk?.flutterRun(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
@@ -426,7 +425,6 @@ class TriageTabContent(
         val isLastExecution = index == devices.size -1
         val currentDevice = devices.elementAt(index)
         val sdk = getFlutterSdk(channelPath)
-        sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
         sdk?.flutterRun(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
@@ -477,7 +475,6 @@ class TriageTabContent(
         val isLastExecution = index == flutterChannelHomePaths.size -1
         val channelPath = flutterChannelHomePaths.elementAt(index)
         val sdk = getFlutterSdk(channelPath)
-        sdk?.flutterPackagesGet(pubProjectRoot)?.startInConsole(project)
         sdk?.flutterUpgrade()?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
                 upgradeChannelsLogs = "Upgrading ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
