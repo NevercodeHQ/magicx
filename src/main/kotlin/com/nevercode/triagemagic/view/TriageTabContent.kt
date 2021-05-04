@@ -219,9 +219,6 @@ class TriageTabContent(
         panel.border = BorderFactory.createEmptyBorder(8,0, 0, 0)
         panel.add(createHeader("Upgrade Flutter"))
 
-        val horizontalLayout = JPanel(GridLayout())
-        horizontalLayout.border = BorderFactory.createEmptyBorder(8, 0,0,0)
-
         val runAllButton = Button("Upgrade All")
         runAllButton.isEnabled = knownFlutterSdkPaths.isNotEmpty()
         runAllButton.addActionListener { upgradeChannels(knownFlutterSdkPaths.toMutableSet()) }
