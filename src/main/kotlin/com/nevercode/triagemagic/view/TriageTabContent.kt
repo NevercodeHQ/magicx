@@ -35,11 +35,13 @@ class TriageTabContent(
     private var selectedChannels = mutableSetOf<String>()
     private var selectedDevice: FlutterDevice? = null
     private var multipleChannelsOutput: String = ""
+    private var selectedLaunchMode: FlutterLaunchMode = FlutterLaunchMode.DEBUG
 
-    // Run on Multiple Channels
+    // Run on Multiple Devices
     private var selectedChannel = ""
     private var selectedDevices = mutableSetOf<FlutterDevice>()
     private var multipleDevicesOutput: String = ""
+    private var multipleDevicesLaunchMode: FlutterLaunchMode = FlutterLaunchMode.DEBUG
 
     private var doctorVOutput: String = ""
     private var upgradeChannelsLogs = ""
@@ -70,7 +72,6 @@ class TriageTabContent(
         group.add(refreshBtn)
         group.add(gapComponent())
         group.add(gapComponent())
-        group.add(gapComponent())
 
         if (knownFlutterSdkPaths.isEmpty()) {
             group.add(Label("No Flutter SDK available!"))
@@ -89,15 +90,21 @@ class TriageTabContent(
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(buildDevicesGroup( false))
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(buildLaunchModeGroup(false))
         group.add(horizontalLayout)
 
         val runDebugBtn = Button("Run")
         runDebugBtn.isEnabled = selectedDevice != null && selectedChannels.isNotEmpty()
-        runDebugBtn.addActionListener { runMultipleChannels(selectedChannels, selectedDevice!!) }
+        runDebugBtn.addActionListener {
+            runMultipleChannels(selectedChannels, selectedDevice!!, selectedLaunchMode)
+        }
 
         group.add(runDebugBtn)
         if (multipleChannelsOutput.isNotEmpty()) {
             group.add(Label(multipleChannelsOutput))
+            group.add(gapComponent())
         }
 
         group.add(gapComponent())
@@ -141,6 +148,40 @@ class TriageTabContent(
                     group.add(radio)
                     g1.add(radio)
                 }
+            }
+        }
+        return group
+    }
+
+    private fun buildLaunchModeGroup(forMultipleDevices: Boolean): Component {
+        val group = JPanel(VerticalLayout())
+        group.add(Label("Launch Mode"))
+        group.add(gapComponent())
+        val g1 = ButtonGroup()
+
+        if (forMultipleDevices) {
+            FlutterLaunchMode.values().forEach { launchMode ->
+                val radio = JRadioButton(launchMode.cliCommand)
+                radio.isSelected = multipleDevicesLaunchMode.cliCommand == launchMode.cliCommand
+                radio.addItemListener {
+                    multipleDevicesLaunchMode = launchMode
+                    g1.setSelected(radio.model, it.stateChange == ItemEvent.SELECTED)
+                    onRefresh(true)
+                }
+                group.add(radio)
+                g1.add(radio)
+            }
+        } else {
+            FlutterLaunchMode.values().forEach { launchMode ->
+                val radio = JRadioButton(launchMode.cliCommand)
+                radio.isSelected = selectedLaunchMode.cliCommand == launchMode.cliCommand
+                radio.addItemListener {
+                    selectedLaunchMode = launchMode
+                    g1.setSelected(radio.model, it.stateChange == ItemEvent.SELECTED)
+                    onRefresh(true)
+                }
+                group.add(radio)
+                g1.add(radio)
             }
         }
         return group
@@ -245,15 +286,21 @@ class TriageTabContent(
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(gapComponent())
         horizontalLayout.add(buildDevicesGroup(true))
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(gapComponent())
+        horizontalLayout.add(buildLaunchModeGroup(true))
         panel.add(horizontalLayout)
 
         val runDebugBtn = Button("Run")
         runDebugBtn.isEnabled = selectedChannel.isNotEmpty() && selectedDevices.isNotEmpty()
-        runDebugBtn.addActionListener { runMultipleDevices(selectedChannel, selectedDevices) }
+        runDebugBtn.addActionListener {
+            runMultipleDevices(selectedChannel, selectedDevices, multipleDevicesLaunchMode)
+        }
 
         panel.add(runDebugBtn)
         if (multipleDevicesOutput.isNotEmpty()) {
             panel.add(Label(multipleDevicesOutput))
+            panel.add(gapComponent())
         }
 
         panel.add(gapComponent())
@@ -266,6 +313,7 @@ class TriageTabContent(
         return header
     }
 
+    // There is no Padding component, so we just use a empty Label to add some space.
     private fun gapComponent() = Label()
 
     private var isRefreshing = false
@@ -364,7 +412,11 @@ class TriageTabContent(
     }
 
     val multipleChannelsRunContent = StringBuilder()
-    private fun runMultipleChannels(flutterChannelHomePaths: MutableSet<String>, device: FlutterDevice, index: Int = 0) {
+    private fun runMultipleChannels(
+        flutterChannelHomePaths: MutableSet<String>,
+        device: FlutterDevice,
+        launchMode: FlutterLaunchMode,
+        index: Int = 0) {
         if (flutterChannelHomePaths.isEmpty()) return
         if (index > flutterChannelHomePaths.size - 1) return
 
@@ -377,7 +429,7 @@ class TriageTabContent(
             device,
             // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
-            FlutterLaunchMode.DEBUG,
+            launchMode,
             project,
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
@@ -399,7 +451,7 @@ class TriageTabContent(
                         .setContents(s, s)
                     multipleChannelsRunContent.clear()
                 } else {
-                    runMultipleChannels(flutterChannelHomePaths, device, index + 1)
+                    runMultipleChannels(flutterChannelHomePaths, device, launchMode, index + 1)
                 }
             }
 
@@ -416,7 +468,11 @@ class TriageTabContent(
     }
 
     val multipleDevicesRunContent = StringBuilder()
-    private fun runMultipleDevices(channelPath: String, devices: MutableSet<FlutterDevice>, index: Int = 0) {
+    private fun runMultipleDevices(
+        channelPath: String,
+        devices: MutableSet<FlutterDevice>,
+        launchMode: FlutterLaunchMode,
+        index: Int = 0) {
         if (devices.isEmpty()) return
         if (index > devices.size - 1) return
 
@@ -429,7 +485,7 @@ class TriageTabContent(
             currentDevice,
             // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
-            FlutterLaunchMode.DEBUG,
+            launchMode,
             project,
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
@@ -451,7 +507,7 @@ class TriageTabContent(
                         .setContents(s, s)
                     multipleDevicesRunContent.clear()
                 } else {
-                    runMultipleDevices(channelPath, devices, index + 1)
+                    runMultipleDevices(channelPath, devices, launchMode,index + 1)
                 }
             }
 
