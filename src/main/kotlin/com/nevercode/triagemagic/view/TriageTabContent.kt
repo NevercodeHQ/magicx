@@ -375,7 +375,8 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             device,
-            RunMode.DEBUG,
+            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            RunMode.PROFILE,
             FlutterLaunchMode.DEBUG,
             project,
             "--verbose"
@@ -426,7 +427,8 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             currentDevice,
-            RunMode.DEBUG,
+            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            RunMode.PROFILE,
             FlutterLaunchMode.DEBUG,
             project,
             "--verbose"
