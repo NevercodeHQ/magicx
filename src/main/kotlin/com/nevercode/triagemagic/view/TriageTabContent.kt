@@ -4,6 +4,7 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.ui.components.JBScrollPane
 import io.flutter.pub.PubRoot
 import io.flutter.run.FlutterDevice
 import io.flutter.run.FlutterLaunchMode
@@ -62,7 +63,10 @@ class TriageTabContent(
     }
 
     private fun buildContent(): Component {
+        autoscrolls = true
         val group = JPanel(VerticalLayout())
+        group.autoscrolls = true
+        group.preferredSize = Dimension(200, 2000)
 
         group.border = BorderFactory.createEmptyBorder(8, 32, 0, 32)
 
@@ -111,7 +115,13 @@ class TriageTabContent(
         group.add(buildFlutterRunOnMultipleDevicesContent())
         group.add(buildFlutterDoctorsContent())
         group.add(upgradeChannelsContent())
-        return group
+
+        val scrollable = JBScrollPane(group)
+        scrollable.autoscrolls = true
+        scrollable.preferredSize = Dimension(200,
+            (group.preferredSize.height - (group.preferredSize.height * 0.1)).toInt()
+        )
+        return scrollable
     }
 
     private fun buildDevicesGroup(forMultipleDevices: Boolean): Component {
