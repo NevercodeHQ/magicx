@@ -116,7 +116,7 @@ class TriageTabContent(
         val scrollable = JBScrollPane(group)
         scrollable.autoscrolls = true
         scrollable.preferredSize = Dimension(200,
-            (group.preferredSize.height - (group.preferredSize.height * 0.2)).toInt()
+            (group.preferredSize.height - (group.preferredSize.height * 0.3)).toInt()
         )
         return scrollable
     }
