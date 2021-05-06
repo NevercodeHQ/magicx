@@ -18,10 +18,7 @@ import org.jdesktop.swingx.VerticalLayout
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ItemEvent
-import javax.swing.BorderFactory
-import javax.swing.ButtonGroup
-import javax.swing.JPanel
-import javax.swing.JRadioButton
+import javax.swing.*
 
 class TriageTabContent(
     private val project: Project,
@@ -30,7 +27,7 @@ class TriageTabContent(
 ) : JPanel(BorderLayout()) {
 
     private var availableDevices = mutableListOf<FlutterDevice>()
-    private var knownFlutterSdkPaths = arrayListOf<String>()
+    private var knownFlutterSdkPaths = mutableSetOf<String>()
 
     // Run on Multiple Channels
     private var selectedChannels = mutableSetOf<String>()
@@ -254,7 +251,7 @@ class TriageTabContent(
 
         val runAllButton = Button("For all channels")
         runAllButton.isEnabled = knownFlutterSdkPaths.isNotEmpty()
-        runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths) }
+        runAllButton.addActionListener { onGenerateFlutterDoctors(knownFlutterSdkPaths.toArrayList()) }
         panel.add(runAllButton)
 
         if (doctorVOutput.isNotEmpty()) {
