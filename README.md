@@ -10,3 +10,5 @@ Triagemagic is a IntelliJ plugin to help you triage issues related to Flutter.
 - [x] Upgrade All Flutter channels
 - [ ] Copy Triage response template
 
+<img src="/screenshots/static_image.png">
+
