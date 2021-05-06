@@ -35,7 +35,6 @@ class FormatTabContent : JPanel(VerticalLayout()) {
         }
 
         add(Label()) // Just a empty space.
-        add(Label()) // Just a empty space.
         add(infoLabel)
     }
 
