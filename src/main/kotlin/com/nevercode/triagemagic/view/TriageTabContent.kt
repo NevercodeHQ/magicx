@@ -116,7 +116,7 @@ class TriageTabContent(
         val scrollable = JBScrollPane(group)
         scrollable.autoscrolls = true
         scrollable.preferredSize = Dimension(200,
-            (group.preferredSize.height - (group.preferredSize.height * 0.1)).toInt()
+            (group.preferredSize.height - (group.preferredSize.height * 0.2)).toInt()
         )
         return scrollable
     }
@@ -430,6 +430,7 @@ class TriageTabContent(
         val isLastExecution = index == flutterChannelHomePaths.size -1
         val flutterChannelHomePath = flutterChannelHomePaths.elementAt(index)
         val sdk = getFlutterSdk(flutterChannelHomePath)
+        val channelName = getSdkName(sdkChannel = sdk?.queryFlutterChannel(true))
         sdk?.flutterRun(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
@@ -441,7 +442,7 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                multipleChannelsOutput = "Running flutter run on ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
+                multipleChannelsOutput = "Running flutter run on $channelName..."
                 onRefresh(true)
             }
 
@@ -465,7 +466,7 @@ class TriageTabContent(
             override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
                 if (multipleChannelsRunContent.isEmpty() || multipleChannelsRunContent.endsWith("</details>\n")) {
                     multipleChannelsRunContent.append("<details>\n")
-                    multipleChannelsRunContent.append("<summary>logs</summary>\n")
+                    multipleChannelsRunContent.append("<summary>flutter run -v ($channelName)</summary>\n")
                     multipleChannelsRunContent.append("\n")
                     multipleChannelsRunContent.append("```console\n")
                 }
@@ -486,6 +487,7 @@ class TriageTabContent(
         val isLastExecution = index == devices.size -1
         val currentDevice = devices.elementAt(index)
         val sdk = getFlutterSdk(channelPath)
+        val channelName = getSdkName(sdkChannel = sdk?.queryFlutterChannel(true))
         sdk?.flutterRun(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
@@ -497,7 +499,7 @@ class TriageTabContent(
             "--verbose"
         )?.startInConsole(project)?.addProcessListener(object: ProcessListener {
             override fun startNotified(event: ProcessEvent) {
-                multipleDevicesOutput = "Running ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))} on ${currentDevice.deviceName()}..."
+                multipleDevicesOutput = "Running $channelName on ${currentDevice.deviceName()}..."
                 onRefresh(true)
             }
 
@@ -521,7 +523,7 @@ class TriageTabContent(
             override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
                 if (multipleDevicesRunContent.isEmpty() || multipleDevicesRunContent.endsWith("</details>\n")) {
                     multipleDevicesRunContent.append("<details>\n")
-                    multipleDevicesRunContent.append("<summary>logs</summary>\n")
+                    multipleDevicesRunContent.append("<summary>flutter run -v ($channelName) on ${currentDevice.deviceName()}</summary>\n")
                     multipleDevicesRunContent.append("\n")
                     multipleDevicesRunContent.append("```bash\n")
                 }
