@@ -1,12 +1,9 @@
 package com.nevercode.triagemagic.view
 
-import com.intellij.icons.AllIcons
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBScrollPane
+import com.nevercode.triagemagic.notification.TriagemagicNotificationManager
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.jdesktop.swingx.VerticalLayout
@@ -26,7 +23,8 @@ class TemplateTabContent : JTabbedPane(), Disposable {
 
     private fun buildContent() {
         val json = Json { allowStructuredMapKeys = true }
-        val templateString = TemplateDataString.getTemplateData().replace("\n", "")
+        val templateString = TemplateTabContent::class.java
+            .getResource("/data/template.json")!!.readText()
 
         val data: TemplateData = json.decodeFromString(TemplateData.serializer(), templateString)
 
@@ -109,21 +107,8 @@ class TemplateTabContent : JTabbedPane(), Disposable {
     override fun dispose() = Disposer.dispose(this)
 }
 
-class TriagemagicNotificationManager {
-
-    companion object {
-        private val balloonGroup = NotificationGroup("triagemagic.balloon",
-            NotificationDisplayType.BALLOON, false, null, AllIcons.Toolwindows.InfoEvents)
-
-        fun showNotification(title: String, message: String) {
-            balloonGroup .createNotification(title, message, NotificationType.INFORMATION)
-                .notify(null)
-        }
-    }
-}
-
 @Serializable
-data class TemplateData (
+private data class TemplateData (
     val flutter: List<Extra>,
     val tool: List<Extra>,
     val plugins: List<Extra>,
@@ -136,7 +121,7 @@ data class TemplateData (
 )
 
 @Serializable
-data class Extra (
+private data class Extra (
     @SerialName("use_case")
     val useCase: String,
     val action: String,
