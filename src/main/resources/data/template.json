@@ -1,0 +1,227 @@
+{
+  "flutter": [
+    {
+      "use_case": "question on personal code",
+      "action": "close",
+      "response": "Hi @...\nIt seems you are asking for assistance on personal code. Please see https://flutter.dev/community for resources and asking questions like this,\nyou may also get some help if you post it on Stack Overflow and if you need help with your code, please see https://www.reddit.com/r/flutterhelp/\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "stack overflow question",
+      "action": "close",
+      "response": "Hi @...\nThis issue doesn't seem to describe a bug or a feature request. Please see https://flutter.dev/community for resources and asking questions like this,\nyou may also get some help if you post it on Stack Overflow and if you need help with your code, please see https://www.reddit.com/r/flutterhelp/\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "DUPLICATE",
+      "action": "close",
+      "response": "Hi @...\nI see there's an open issue addressing the case you described.\nPlease follow up on that issue, I'm closing the current one as a duplicate.\nIf you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "TIMEOUT",
+      "response": "Without additional information, we are unfortunately not sure how to resolve this issue. \nWe are therefore reluctantly going to close this bug for now. \nPlease don't hesitate to comment on the bug if you have any more information for us; we will reopen it right away!  \nThanks for your contribution.\n\nCould everyone who still has this problem please file a new issue with the exact description of what happens, logs, and the output of `flutter doctor -v`.\nAll system setups can be slightly different, so it's always better to open new issues and reference related issues.",
+      "action": "close"
+    },
+    {
+      "use_case": "maybe stack",
+      "response": "Hi @... \nthe goal of this github repo is not to give assistance on personal code,\nbut to improve flutter reporting bugs or with feature requests;\n\nif you encountered a behaviour that you believe could be a bug\nplease provide a reproducible minimal code sample that represent the problem,\n\nif instead you think that the issue might depend from your implementation\nplease see flutter's [community](https://flutter.dev/community) for resources and asking questions like this,\nyou may also get some help if you post it on Stack Overflow and [flutterhelp](https://www.reddit.com/r/flutterhelp/)\nThank you\n",
+      "action": "waiting"
+    },
+    {
+      "use_case": "RUNTIME crash or error Unexpected behavior [sample is needed]",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter run --verbose` and a minimal complete reproducible code sample?\nThank you",
+      "action": "waiting"
+    },
+    {
+      "use_case": "PRODUCTION\n[crash]",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `crash logs`, your `pubspec.yaml`, the list of affected devices and if possible your `flutter run --release --verbose` running on the same OS version as the affected devices.\nThank you",
+      "action": "waiting"
+    },
+    {
+      "use_case": "Platform view\n[behaviour]",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v` and a complete reproducible minimal code sample?",
+      "action": "waiting"
+    },
+    {
+      "use_case": "Platform view\n[crash]",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v` your `flutter run --verbose` and a complete reproducible minimal code sample\nThank you",
+      "action": "waiting"
+    },
+    {
+      "use_case": "Repro link",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v` and `flutter run --verbose` logs, and a [minimal complete reproducible code sample](https://stackoverflow.com/help/minimal-reproducible-example)?\nThank you",
+      "action": "N/A"
+    }
+  ],
+  "tool": [
+    {
+      "use_case": "[t: devtool]",
+      "action": "close",
+      "response": "Hi @... , \nTo report bugs or feature request regarding `devtools` please open an issue in the dedicated [github](https://github.com/flutter/devtools/issues).\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "[BUILD CRASH] [iOS] [android]\n - DEBUG - NO PLUGINS",
+      "action": "waiting",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter run --verbose` and your `pubspec.yaml`.\nIf the logs are too long, you may attach them as a txt file.\nThank you"
+    },
+    {
+      "use_case": "[BUILD CRASH] [iOS]\n - RELEASE - NO PLUGINS",
+      "action": "waiting",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter build ios --verbose` and your `pubspec.yaml`.\nIf the logs are too long, you may attach them as a txt file.\nThank you"
+    },
+    {
+      "use_case": "[BUILD CRASH] [android]\n - RELEASE - NO PLUGINS",
+      "action": "waiting",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter build appbundle --verbose` and your `pubspec.yaml`.\nIf the logs are too long, you may attach them as a txt file.\nThank you"
+    },
+    {
+      "use_case": "PUB  CRASH",
+      "action": "waiting",
+      "response": "Hi @...\nCan you please run (making sure you run from your terminal and not from an IDE)\n```console\ncd <your app folder>\nflutter doctor -v\nflutter pub upgrade --verbose\n``` \nand provide the output.\nThank you"
+    },
+    {
+      "use_case": "DOCTOR  CRASH",
+      "action": "waiting",
+      "response": "\nHi @... \nCan you please run from your terminal (making sure that flutter is added to your path)\n```console\nflutter doctor -v\n```\nand provide the full logs.\nThank you"
+    }
+  ],
+  "plugins": [
+    {
+      "use_case": "External [flutterfire]\non [flutter/flutter]",
+      "action": "close",
+      "response": "Hi @...\nFrom what I can see, the issue is related to a FlutterFire plugin rather than to Flutter itself. Please open the issue in the dedicated [repository](https://github.com/FirebaseExtended/flutterfire/issues).\nClosing, as this isn't an issue with Flutter itself.  \nIf you disagree, please write in the comments,  \nproviding your `flutter doctor -v`, your `flutter run -v`,  your `pubspec.yaml`\na minimal reproducible code sample that does not use 3rd party plugins, \nand I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "External\n[3rd party]",
+      "action": "close",
+      "response": "Hi @...\nFrom what I can see, the issue is related to a 3rd party plugin rather than to Flutter itself. Please open the issue in the dedicated [repository](<INSERT GITHUB LINK>).\nClosing, as this isn't an issue with Flutter itself.  \nIf you disagree, please write in the comments,  \nproviding your `flutter doctor -v`, your `flutter run -v`,  your `pubspec.yaml`\na minimal reproducible code sample that does not use 3rd party plugins,  \nand I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "External\n[community]\n",
+      "action": "close",
+      "response": "Hi @...\nFrom what I can see, the issue is related to a plugin maintained by the ‘fluttercommunity’ rather than to Flutter itself. Please open the issue in the dedicated [repository](https://github.com/fluttercommunity/community/issues).\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments, possibly providing a minimal reproducible code sample that does not use 3rd party plugins, and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "ONLY FOR \n[FLUTTER FIRE] GITHUB\nStack overflow question",
+      "action": "close",
+      "response": "Hi @... \nThis platform is not meant for assistance on personal code. Please see https://firebase.google.com/support for resources for asking questions like this and check our [guides](https://firebaseopensource.com/projects/firebaseextended/flutterfire/); you may also get some help if you post it on Stack Overflow.\nClosing, as this isn't an issue with FlutterFire itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "[FIRST PARTY]\n& \n[FLUTTER FIRE]\noutdated plugin version",
+      "action": "waiting",
+      "response": "\nHi @... \nCan you please update the plugin to the latest version. If the issue persists, please provide your updated `pubspec.yaml`, your `flutter run --verbose`, and a minimal reproducible code sample.\nThank you"
+    },
+    {
+      "use_case": "[FIRST PARTY]\n& \n[FLUTTER FIRE]\ndoesn't build - debug/release",
+      "action": "waiting",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter run --verbose` and your `pubspec.yaml`. \nThank you"
+    },
+    {
+      "use_case": "[FIRST PARTY]\n& \n[FLUTTER FIRE]\ncrash at runtime \nor wrong behaviour",
+      "action": "waiting",
+      "response": "Hi @... \nCan you please provide your `flutter doctor -v`, your `flutter run --verbose`, your `pubspec.yaml` and a minimal reproducible code sample.\nThank you"
+    },
+    {
+      "use_case": "[FIRST PARTY]\n& \n[THIRD & PARTY]\npackages conflicts",
+      "action": "close",
+      "response": "Hi @...\nPlease see [Conflict resolution](https://flutter.dev/docs/development/packages-and-plugins/using-packages#conflict-resolution) section to see how to solve this version conflict.\n\nClosing as this is not an issue with flutter itself. If you disagree please comment and I will reopen it.\nThank you"
+    }
+  ],
+  "IDE": [
+    {
+      "use_case": "maybe tools",
+      "action": "waiting",
+      "response": "Hi @...\nAre you experiencing the issue running the app from terminal as well?\nIf so, could you provide the logs.\nThank you"
+    },
+    {
+      "use_case": "100% android studio",
+      "action": "close",
+      "response": "Hi @...  \nFollowing the indication of [jetbrains' Flutter plugin](https://plugins.jetbrains.com/plugin/9212-flutter), the correct way to address the problem is to open an issue in the dedicated [repository](https://github.com/flutter/flutter-intellij/issues).\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "possibly android studio",
+      "action": "waiting",
+      "response": "Hi @...\nAre you experiencing the issue only with Android Studio / IntelliJ or with VS Code as well?\nThank you"
+    },
+    {
+      "use_case": "100% vs code",
+      "action": "waiting",
+      "response": "Hi @...  \nFollowing the indication of [VS Code Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter), the correct way to address the problem is to open an issue in the dedicated [repository](https://github.com/Dart-Code/Dart-Code/issues).\nClosing, as this isn't an issue with Flutter itself. If you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "possibly vs code",
+      "action": "waiting",
+      "response": "Hi @...\nAre you experiencing the issue only with VS Code or with Android Studio as well?\nThank you"
+    },
+    {
+      "use_case": "possibly Android Studio/VS Code",
+      "action": "waiting",
+      "response": "Hi @...\nIf you are experiencing the issue only with Android Studio or IntelliJ and not with VS Code, then following the indication of [jetbrains' Flutter plugin](https://plugins.jetbrains.com/plugin/9212-flutter), the correct way to address the problem is to open an issue in the dedicated [repository](https://github.com/flutter/flutter-intellij/issues).\n\nIf you are experiencing the issue only with VS Code and not with Android Studio or terminal, then following the indication of [VS Code Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter), the correct way to address the problem is to open an issue in the dedicated [repository](https://github.com/Dart-Code/Dart-Code/issues).\nOtherwise, please provide your ´flutter doctor - v´ output.\nThank you"
+    }
+  ],
+  "Extras": [
+    {
+      "use_case": "bad sample",
+      "action": "close",
+      "response": "Hi @... \nFor the issue to be workable, it needs to be reproducible with a minimal complete code sample that doesn’t include 3rd party plugins or complex production code. Please provide such sample.\nThank you"
+    },
+    {
+      "use_case": "outdated flutter version",
+      "action": "waiting",
+      "response": "\nHi @...\nCould you please run `flutter upgrade --force`. \nIf the issue persists, please provide your updated `flutter doctor -v`, your `flutter run --verbose` and a minimal reproducible code sample.\nThank you"
+    },
+    {
+      "use_case": "CI/CD",
+      "action": "close",
+      "response": "Hi @...\nif the issue does not occur locally, but only with your CI/CD\nI recommend you to ask support directly to the service provider.\nClosing, as this isn't an issue with Flutter itself.\nIf you disagree, please write in the comments and I will reopen it.\nThank you"
+    },
+    {
+      "use_case": "multiple issues in one",
+      "action": "add to answer",
+      "response": "Please file a new issue for this and completely fill out the template. We don't track more than one problem in a GitHub issue as they may be duplicates of different existing issues, or may need different teams to look at them."
+    },
+    {
+      "use_case": "spam",
+      "action": "comment",
+      "response": "Using \"add reaction\" on the initial comment would increase priority while +1 comments are rather pointless and cause lots of people to get notified for no reason.\nTo get notified yourself, use the [Subscribe] button to the top right instead."
+    },
+    {
+      "use_case": "empty issue",
+      "action": "close",
+      "response": "Hi @...,\nWhen opening an issue, please try to provide all or some of the information indicated in the template.\n\n<details>\n  <summary>Issue Template</summary>\n\n```\nIf you are looking for support, please check out our documentation\nor consider asking a question on Stack Overflow:\n- https://flutter.dev/\n- https://api.flutter.dev/\n- https://stackoverflow.com/questions/tagged/flutter?sort=frequent\n\nIf you have found a bug or if our documentation doesn't have an answer\nto what you're looking for, then fill our the template below. Please read\nour guide to filing a bug first: https://flutter.dev/docs/resources/bug-reports\n\nSteps to Reproduce\n\nPlease tell us exactly how to reproduce the problem you are running into.\n\nPlease attach a small application (ideally just one main.dart file) that\nreproduces the problem. You could use https://gist.github.com/ for this.\n\nIf the problem is with your application's rendering, then please attach\na screenshot and explain what the problem is.\n\n1. ...\n2. ...\n3. ...\n\n\nPlease tell us which target platform(s) the problem occurs (Android / iOS / Web / macOS / Linux / Windows)\nWhich target OS version, for Web, browser, is the test system running?\nDoes the problem occur on emulator/simulator as well as on physical devices?\n\nTarget Platform:\nTarget OS version/browser:\nDevices:\n\nRun your application with `flutter run --verbose` and attach all the\nlog output below between the lines with the backticks. If there is an\nexception, please see if the error message includes enough information\nto explain how to solve the issue.\n\nRun `flutter analyze` and attach any output of that command below.\nIf there are any analysis errors, try resolving them before filing this issue.\n\nFinally, paste the output of running `flutter doctor -v` here.\n```\n</details>\n\nClosing this issue, since no information has been provided.\nThank you."
+    },
+    {
+      "use_case": "done",
+      "action": "close",
+      "response": "Hi @...\nGiven your last message I feel safe to close this issue, if you disagree please write in the comments and I will reopen it. \nThank you"
+    },
+    {
+      "use_case": "no repro, but many users",
+      "action": "will need additional triage",
+      "response": "I’m unable to reproduce the issue to pinpoint the cause, but there are reports from several users. The issue needs further investigation."
+    },
+    {
+      "use_case": "cannot repro, \nbut can't close either",
+      "action": "will need additional triage",
+      "response": "I’m unable to reproduce the issue to pinpoint the cause. The issue needs further investigation."
+    },
+    {
+      "use_case": "upgrade flutter and try again",
+      "action": "waiting",
+      "response": "Hi @...\nI cannot reproduce this issue on the latest `dev` channel.\nCan you please upgrade to the latest  `dev` and try again\n`flutter channel dev`\n`flutter upgrade --force`\n`flutter doctor -v`\n`flutter doctor -v`"
+    },
+    {
+      "use_case": "FF no template",
+      "action": "waiting",
+      "response": "Hi @... \nCould you please provide your `flutter doctor -v` and `flutter pub deps -- --style=compact`?\nThank you"
+    },
+    {
+      "use_case": "if problem persists",
+      "action": "waiting",
+      "response": "Hi @...\nIf the problem persists, Can you please provide your `flutter doctor -v` with upgrade and `flutter run --verbose` logs, and a [minimal complete reproducible code sample](https://stackoverflow.com/help/minimal-reproducible-example)?\nThank you"
+    },
+    {
+      "use_case": "FF spam",
+      "action": "close",
+      "response": "Hi @...\nWhen opening an issue, please try to provide all of the information indicated in the template.\nClosing this issue, since no information has been provided.\nThank you."
+    }
+  ]
+}
