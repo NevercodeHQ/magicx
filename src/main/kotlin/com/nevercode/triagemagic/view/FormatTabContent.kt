@@ -1,5 +1,6 @@
 package com.nevercode.triagemagic.view
 
+import com.nevercode.triagemagic.notification.TriagemagicNotificationManager
 import org.jdesktop.swingx.VerticalLayout
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
@@ -9,8 +10,6 @@ import javax.swing.BorderFactory
 import javax.swing.JPanel
 
 class FormatTabContent : JPanel(VerticalLayout()) {
-
-    private val infoLabel = Label()
 
     init { buildUI() }
 
@@ -33,9 +32,6 @@ class FormatTabContent : JPanel(VerticalLayout()) {
             btn.addActionListener { onFormat(formatKind) }
             add(btn)
         }
-
-        add(Label()) // Just a empty space.
-        add(infoLabel)
     }
 
     private fun onFormat(kind: FormatKind) {
@@ -52,12 +48,10 @@ class FormatTabContent : JPanel(VerticalLayout()) {
         val selection = StringSelection(builder.toString())
         clipboard.setContents(selection, selection)
 
-        infoLabel.text = "${kind.title} copied!"
-
-        EventQueue.invokeLater {
-            infoLabel.revalidate()
-            infoLabel.repaint()
-        }
+        TriagemagicNotificationManager.showNotification(
+            title = "${kind.title} Copied!",
+            message = "Formatted content copied to clipboard."
+        )
     }
 }
 
