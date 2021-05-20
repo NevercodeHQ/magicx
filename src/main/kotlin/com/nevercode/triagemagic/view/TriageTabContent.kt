@@ -400,7 +400,7 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             device,
-            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            // TODO: remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
             launchMode,
             project,
@@ -457,7 +457,7 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             currentDevice,
-            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            // TODO: remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
             launchMode,
             project,
