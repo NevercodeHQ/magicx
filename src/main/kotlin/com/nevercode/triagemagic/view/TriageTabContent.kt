@@ -323,6 +323,10 @@ class TriageTabContent(
     // There is no Padding component, so we just use a empty Label to add some space.
     private fun gapComponent() = Label()
 
+    // Code responsible for updating the UI, here we basically need to remove
+    // all the AWT components, add them back and then we revalidate the UI.
+    //
+    // We take this time to refresh the channels path and devices list, if the uiOnly is false.
     private var isRefreshing = false
     private fun onRefresh(uiOnly: Boolean = false) {
         if (isRefreshing) return
@@ -347,53 +351,8 @@ class TriageTabContent(
         }
     }
 
-    val doctorContent = StringBuilder()
-    private fun onGenerateFlutterDoctors(channelPaths: ArrayList<String>, index: Int = 0) {
-        if (channelPaths.isEmpty()) return
-        if (index > channelPaths.lastIndex) return
-
-        val isLastExecution = index == channelPaths.lastIndex
-
-        val currentChannelPath = channelPaths.elementAt(index)
-        val sdk = getFlutterSdk(currentChannelPath)!!
-        sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
-            // This is not getting called first actually.
-            override fun startNotified(event: ProcessEvent) {
-                doctorVOutput = "Running flutter doctor -v on ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
-                onRefresh(true)
-            }
-
-            override fun processTerminated(event: ProcessEvent) {
-                doctorVOutput = "Logs copied on Clipboard!"
-                onRefresh(true)
-
-                doctorContent.append("\n```\n")
-                doctorContent.append("</details>\n")
-
-                if (isLastExecution) {
-                    val s = StringSelection(doctorContent.toString())
-                    Toolkit.getDefaultToolkit().systemClipboard.setContents(s, s)
-                    doctorContent.clear()
-                } else {
-                    onGenerateFlutterDoctors(channelPaths, index + 1)
-                }
-            }
-
-            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-                // Hack...
-                if (doctorContent.isEmpty() || doctorContent.endsWith("</details>\n")) {
-                    doctorContent.append("\n")
-                    doctorContent.append("<details>\n")
-                    doctorContent.append("<summary>flutter doctor -v</summary>\n")
-                    doctorContent.append("\n")
-                    doctorContent.append("```console\n")
-                }
-                doctorContent.append(event.text)
-            }
-        })
-    }
-
-    /// Return either the channel name or the last segment of the path.
+    /// Return either the channel name or the last segment of the channel path.
+    /// This may return "unknown" if the options above has failed.
     private fun getSdkName(sdkPath: String? = null, sdkChannel: FlutterSdkChannel? = null): String {
         assert(sdkPath == null || sdkChannel == null)
         if (sdkChannel != null) return  sdkChannel.id.name.toLowerCase()
@@ -418,6 +377,10 @@ class TriageTabContent(
         return null
     }
 
+    // All the following methods are recursive, they will call them self if
+    // its list parameter has more than one item. They stop calling them self if
+    // there is a crash or if it already called itself the same amount of its list size.
+
     val multipleChannelsRunContent = StringBuilder()
     private fun runMultipleChannels(
         flutterChannelHomePaths: MutableSet<String>,
@@ -427,7 +390,9 @@ class TriageTabContent(
         if (flutterChannelHomePaths.isEmpty()) return
         if (index > flutterChannelHomePaths.size - 1) return
 
+        // This will be the last execution if index is equals to the same amount of <flutterChannelHomePaths>
         val isLastExecution = index == flutterChannelHomePaths.size -1
+
         val flutterChannelHomePath = flutterChannelHomePaths.elementAt(index)
         val sdk = getFlutterSdk(flutterChannelHomePath)
         val channelName = getSdkName(sdkChannel = sdk?.queryFlutterChannel(true))
@@ -435,7 +400,7 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             device,
-            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            // TODO: remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
             launchMode,
             project,
@@ -492,7 +457,7 @@ class TriageTabContent(
             pubProjectRoot,
             pubProjectRoot.libMain!!,
             currentDevice,
-            // TODO(pedromassango): remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
+            // TODO: remove this once https://github.com/flutter/flutter-intellij/issues/5461 is fixed.
             RunMode.PROFILE,
             launchMode,
             project,
@@ -528,6 +493,52 @@ class TriageTabContent(
                     multipleDevicesRunContent.append("```bash\n")
                 }
                 multipleDevicesRunContent.append(event.text)
+            }
+        })
+    }
+
+    val doctorContent = StringBuilder()
+    private fun onGenerateFlutterDoctors(channelPaths: ArrayList<String>, index: Int = 0) {
+        if (channelPaths.isEmpty()) return
+        if (index > channelPaths.lastIndex) return
+
+        val isLastExecution = index == channelPaths.lastIndex
+
+        val currentChannelPath = channelPaths.elementAt(index)
+        val sdk = getFlutterSdk(currentChannelPath)!!
+        sdk.flutterDoctor().startInConsole(project).addProcessListener(object: ProcessListener {
+            // This is not getting called first actually.
+            override fun startNotified(event: ProcessEvent) {
+                doctorVOutput = "Running flutter doctor -v on ${getSdkName(sdkChannel = sdk.queryFlutterChannel(true))}..."
+                onRefresh(true)
+            }
+
+            override fun processTerminated(event: ProcessEvent) {
+                doctorVOutput = "Logs copied on Clipboard!"
+                onRefresh(true)
+
+                doctorContent.append("\n```\n")
+                doctorContent.append("</details>\n")
+
+                if (isLastExecution) {
+                    val s = StringSelection(doctorContent.toString())
+                    Toolkit.getDefaultToolkit().systemClipboard.setContents(s, s)
+                    doctorContent.clear()
+                } else {
+                    onGenerateFlutterDoctors(channelPaths, index + 1)
+                }
+            }
+
+            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
+                // Hack...
+                if (doctorContent.isEmpty() || doctorContent.endsWith("</details>\n")) {
+                    doctorContent.append("\n")
+                    doctorContent.append("<details>\n")
+                    doctorContent.append("<summary>flutter doctor -v</summary>\n")
+                    doctorContent.append("\n")
+                    doctorContent.append("```console\n")
+                }
+                doctorContent.append(event.text)
             }
         })
     }
