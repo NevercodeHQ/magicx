@@ -17,6 +17,8 @@ import java.awt.Label
 class TriagemagicViewFactory : ToolWindowFactory, DumbAware {
 
   override fun init(toolWindow: ToolWindow) {
+    // Whether Triagemagic tool window should be visible or not.
+    // We can use this to disable Triagemagic for invalid projects.
     toolWindow.setAvailable(true, null)
   }
 
